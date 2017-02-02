@@ -1,0 +1,51 @@
+<html>
+<head></head>
+<body>
+    <script type="text/javascript">
+        var webSocket = null;
+        var websocketURI = "ws://127.0.0.1:1234";
+
+        window.onload = function() {
+
+            console.log("onload");
+
+            webSocket = new WebSocket(websocketURI);
+
+            webSocket.onopen = function() {
+                console.log("connected to " + websocketURI);
+            }
+
+            webSocket.onclose = function(e) {
+                console.log("connection closed (" + e.code + ")");
+            }
+
+            webSocket.onmessage = function(e) {
+                console.log("message received: " + e.data);
+                var liNode = document.createElement("LI");
+                var textNode = document.createTextNode( e.data );
+                liNode.appendChild( textNode );
+
+                document.getElementById( 'messages' ).appendChild(
+                    liNode
+                );
+            }
+        };
+
+        function send() {
+            var msg = document.getElementById('message').value;
+            webSocket.send(msg);
+        };
+    </script>
+    <h1>WebSocket Echo Test</h1>
+    <form>
+        <p>
+            Message: <input id="message" type="text" value="Hello, world!">
+        </p>
+        <p id ="recieved">
+            <h1>Recieved</h1>
+            <ul id="messages"></ul>
+        </p>
+    </form>
+    <button onclick="send();">Send Message</button>
+</body>
+</html>
