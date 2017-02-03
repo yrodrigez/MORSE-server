@@ -29,15 +29,20 @@ func Echo(ws *websocket.Conn) {
 	}
 }
 
+func serveFileHandler() {
+	http.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/" + "client" + ".html")
+	})
+}
+
 func main() {
 	http.Handle("/", websocket.Handler(Echo))
-	http.HandleFunc("/client", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("r.URL.Path[1:]= ", r.URL.Path[1:])
-		http.ServeFile(w, r, "static/" + r.URL.Path[1:] + ".html")
-	})
+	serveFileHandler()
 
-	if err := http.ListenAndServe(":1234", nil); err != nil {
-		log.Fatal("ListenAndServe:", err)
+
+
+	if err2 := http.ListenAndServe("", nil); err2 != nil {
+		log.Fatal("ListenAndServe:", err2)
 	}
 
 }

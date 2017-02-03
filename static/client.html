@@ -1,51 +1,81 @@
 <html>
 <head></head>
 <body>
-    <script type="text/javascript">
-        var webSocket = null;
-        var websocketURI = "ws://127.0.0.1:1234";
+<script type="text/javascript">
+    var webSocket = null;
+    var websocketURI = "ws://127.0.0.1";
 
-        window.onload = function() {
+    window.onload = function () {
 
-            console.log("onload");
+        console.log("onload");
 
-            webSocket = new WebSocket(websocketURI);
+        webSocket = new WebSocket(websocketURI);
 
-            webSocket.onopen = function() {
-                console.log("connected to " + websocketURI);
-            }
-
-            webSocket.onclose = function(e) {
-                console.log("connection closed (" + e.code + ")");
-            }
-
-            webSocket.onmessage = function(e) {
-                console.log("message received: " + e.data);
-                var liNode = document.createElement("LI");
-                var textNode = document.createTextNode( e.data );
-                liNode.appendChild( textNode );
-
-                document.getElementById( 'messages' ).appendChild(
-                    liNode
-                );
-            }
+        webSocket.onopen = function () {
+            console.log("connected to " + websocketURI);
         };
 
-        function send() {
-            var msg = document.getElementById('message').value;
-            webSocket.send(msg);
+        webSocket.onclose = function (e) {
+            console.log("connection closed (" + e.code + ")");
         };
-    </script>
-    <h1>WebSocket Echo Test</h1>
-    <form>
-        <p>
-            Message: <input id="message" type="text" value="Hello, world!">
-        </p>
-        <p id ="recieved">
-            <h1>Recieved</h1>
-            <ul id="messages"></ul>
-        </p>
-    </form>
-    <button onclick="send();">Send Message</button>
+
+        webSocket.onmessage = function (e) {
+            console.log("message received: " + e.data);
+            var liNode = document.createElement("LI");
+            var textNode = document.createTextNode(e.data+"\n");
+            liNode.appendChild(textNode);
+
+            document.getElementById('messages').appendChild(
+                textNode
+            );
+        };
+
+        var messageBox = document.getElementById( 'message' );
+
+        messageBox.addEventListener( 'click', function () {
+          if( this.value.match(/Write your message...$/) ){
+              this.value = "";
+              this.style.color = "black";
+          }
+
+        });
+
+        messageBox.addEventListener( 'blur', function () {
+            if( this.value.match(/$/) ) {
+                this.value = "Write your message...";
+                this.style.color = "gray";
+            }
+        });
+
+        messageBox.addEventListener( 'keyup', function (event) {
+            if( event.keyCode === 13){
+                send();
+                this.value = "";
+            }
+
+        });
+    };
+
+    function send() {
+        var msg = document.getElementById('message').value;
+        webSocket.send(msg);
+    };
+
+
+</script>
+<h1>WebSocket Echo Test</h1>
+
+
+<h1>Recieved</h1>
+<label for="messages"></label>
+<textarea id="messages" readonly rows="30" cols="80"></textarea>
+<br/>
+
+
+Message: <label for="message"></label>
+<br/>
+<input id="message" type="text" size="30" value="Write your message..." style="color: gray">
+<br/>
+<button onclick="send();">Send Message</button>
 </body>
 </html>
