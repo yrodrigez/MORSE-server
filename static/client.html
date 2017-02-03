@@ -12,7 +12,7 @@
         webSocket = new WebSocket(websocketURI);
 
         webSocket.onopen = function () {
-            console.log("connected to " + websocketURI);
+            console.log("connected to " + webSocket.url);
         };
 
         webSocket.onclose = function (e) {
@@ -41,9 +41,9 @@
         });
 
         messageBox.addEventListener( 'blur', function () {
-            if( this.value.match(/$/) ) {
+            if( this.value === "" ) {
                 this.value = "Write your message...";
-                this.style.color = "gray";
+                this.style.color = "#6a6a6a";
             }
         });
 
@@ -57,24 +57,25 @@
     };
 
     function send() {
-        var msg = document.getElementById('message').value;
-        webSocket.send(msg);
-    };
-
-
+        var messageBox = document.getElementById( 'message' );
+        if ( messageBox.value === "" || messageBox.value.match(/Write your message...$/) ){
+            alert( 'write something!' );
+        } else {
+            var msg = messageBox.value;
+            webSocket.send(msg);
+        }
+    }
 </script>
-<h1>WebSocket Echo Test</h1>
-
-
-<h1>Recieved</h1>
-<label for="messages"></label>
-<textarea id="messages" readonly rows="30" cols="80"></textarea>
+<h1>Morse</h1>
+<img width="50" height="50" src="https://github.com/yrodrigez/MORSE/raw/master/MORSE.png"/>
 <br/>
-
+<label for="messages"></label>
+<textarea style="resize: none" id="messages" readonly rows="30" cols="80"></textarea>
+<br/>
 
 Message: <label for="message"></label>
 <br/>
-<input id="message" type="text" size="30" value="Write your message..." style="color: gray">
+<input id="message" type="text" size="30" value="Write your message..." style="color: #6a6a6a">
 <br/>
 <button onclick="send();">Send Message</button>
 </body>
