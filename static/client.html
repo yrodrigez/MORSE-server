@@ -3,7 +3,7 @@
 <body>
 <script type="text/javascript">
     var webSocket = null;
-    var websocketURI = "ws://127.0.0.1";
+    var websocketURI = "ws://{{$}}/ws";
 
     window.onload = function () {
 
@@ -11,8 +11,11 @@
 
         webSocket = new WebSocket(websocketURI);
 
+        var messages = document.getElementById( 'messages' );
+
         webSocket.onopen = function () {
             console.log("connected to " + webSocket.url);
+            messages.appendChild(document.createTextNode( 'Connection to: ' +  webSocket.url + ' established\n' ));
         };
 
         webSocket.onclose = function (e) {
@@ -21,10 +24,12 @@
 
         webSocket.onmessage = function (e) {
             console.log("message received: " + e.data);
-            var liNode = document.createElement("LI");
-            var textNode = document.createTextNode(e.data+"\n");
-            liNode.appendChild(textNode);
-
+            var message = JSON.parse( e.data );
+            var date = new Date( message.date );
+            var textNode = document.createTextNode(
+                date.getHours() + ':' + date.getMinutes()
+                + ' ' + message.id + ' says: ' + message.text+"\n"
+            );
             document.getElementById('messages').appendChild(
                 textNode
             );
@@ -57,12 +62,18 @@
     };
 
     function send() {
-        var messageBox = document.getElementById( 'message' );
-        if ( messageBox.value === "" || messageBox.value.match(/Write your message...$/) ){
+        var messageBox = document.getElementById( 'message' ).value;
+        var id = document.getElementById( 'name' ).value;
+        if ( messageBox === "" || messageBox.match(/Write your message...$/) ){
             alert( 'write something!' );
         } else {
-            var msg = messageBox.value;
-            webSocket.send(msg);
+            var msg = {
+                type: "message",
+                text: messageBox,
+                id:   id,
+                date: Date.now()
+            };
+            webSocket.send('\n' + JSON.stringify( msg ));
         }
     }
 </script>
@@ -73,10 +84,11 @@
 <textarea style="resize: none" id="messages" readonly rows="30" cols="80"></textarea>
 <br/>
 
-Message: <label for="message"></label>
+<label for="name"></label>
+<input id="name" type="text" size="5" value ="name..."/>
+<label for="message"></label>
 <br/>
 <input id="message" type="text" size="30" value="Write your message..." style="color: #6a6a6a">
-<br/>
 <button onclick="send();">Send Message</button>
 </body>
 </html>
